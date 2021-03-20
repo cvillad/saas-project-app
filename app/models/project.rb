@@ -1,7 +1,7 @@
 class Project < ApplicationRecord
   belongs_to :tenant
   validates_uniqueness_of :title 
-  validates :free_plan_can_only_have_one_project
+  validate :free_plan_can_only_have_one_project
 
   def free_plan_can_only_have_one_project
     if self.new_record? && (tenant.projects.count > 0) && (tenant.plan == "free")
