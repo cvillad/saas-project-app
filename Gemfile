@@ -33,6 +33,7 @@ gem 'milia'
 gem 'twitter-bootstrap-rails'
 gem 'devise-bootstrap-views'
 gem 'jquery-rails'
+gem 'bootstrap-datepicker-rails'
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
