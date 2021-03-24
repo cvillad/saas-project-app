@@ -31,6 +31,8 @@ gem 'dotenv-rails'
 gem 'devise'
 gem 'milia'
 gem 'aws-sdk-s3', '~> 1'
+gem 'stripe'
+
 gem 'twitter-bootstrap-rails'
 gem 'devise-bootstrap-views'
 gem 'jquery-rails'
