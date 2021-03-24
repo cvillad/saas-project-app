@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   resources :artifacts
   resources :tenants do
     resources :projects
@@ -8,9 +7,8 @@ Rails.application.routes.draw do
   get 'home/index'
   root to: "home#index"
     
-  # *MUST* come *BEFORE* devise's definitions (below)
   as :user do   
-    match '/user/confirmation' => 'confirmations#update', via: :put, as: :update_user_confirmation
+    put '/user/confirmation', to: 'confirmations#update', as: :update_user_confirmation
   end
 
   devise_for :users, controllers: { 
@@ -19,5 +17,8 @@ Rails.application.routes.draw do
     sessions: "milia/sessions", 
     passwords: "milia/passwords", 
   }
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  
+  get "/plan/edit", to: "tenants#edit", as: :edit_plan
+  match '/plan/update' => 'tenants#update', via: [:put, :patch], as: :update_plan
+
 end

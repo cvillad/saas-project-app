@@ -10,7 +10,7 @@ function GetURLParameter(sParam) {
   }  
 };
   
-$(document).ready(function() {
+$(document).on("turbolinks:load", function() {
   var show_error, stripeResponseHandler, submitHandler;
   // function to handle the submit of the form and intercept the default event
   submitHandler = function (event) {
