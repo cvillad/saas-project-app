@@ -4,7 +4,7 @@
 
 <h1><%= t('.sign_up') %></h1>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), class: "cc_form") do |f| %>
   <%= bootstrap_devise_error_messages! %>
 
   <div class="form-group">
@@ -28,7 +28,7 @@
 
   <%= fields_for :tenant do |w| %>
     <div class="form-group col-md-6 no-left-padding">
-      <%= w.label :name, "Organization" %>
+      <%= w.label :name, "Organization", class: "d-inline" %>
       <span class="description">(Unique name for group or organization for the new account)</span>
       <%= w.text_field :name, required: true, class: "form-control" %>
     </div>
@@ -36,6 +36,34 @@
       <%= w.label :plan %>
       <%= w.select :plan, options_for_select(Plan.options, params[:plan]), {},
           required: true, class: "form-control" %>
+    </div>
+  <% end %>
+
+  <%= fields_for :payment do |p| %>
+    <div class="form-row">
+      <div class="form-group col-md-4 no-left-padding">
+        <%= p.label :card_number, "Card number", data: {stripe: "label"} %>
+        <%= p.text_field :card_number, class: "form-control", required: true, data: {stripe: "number"}  %>
+      </div>
+      <div class="form-group col-md-2">
+        <%= p.label :card_cvc, "CVV", data: {stripe: "label"} %>
+        <%= p.text_field :card_cvc, class: "form-control", required: true, data: {stripe: "cvc"}  %>
+      </div>
+      <div class="form-group col-md-6 no-left-padding">
+        <div class="col-md-12">
+          <%= p.label :card_expires, "Card expires", data: {stripe: "label"} %>
+        </div>
+        <div class="col-md-4">
+          <%= p.select :card_expires_month, options_for_select(Payment.month_options), 
+              {include_blank: "Month"}, "data-stripe": "exp-month", class: "form-control",
+              required: true %>
+        </div>
+        <div class="col-md-4">
+          <%= p.select :card_expires_year, options_for_select(Payment.year_options), 
+              {include_blank: "Year"}, "data-stripe": "exp-year", class: "form-control",
+              required: true %>
+        </div>
+      </div>
     </div>
   <% end %>
 
