@@ -1,11 +1,11 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[ show edit update destroy ]
-  before_action :set_tenant, only: [:show, :edit, :update, :destroy, :new, :create]
+  before_action :set_project, only: %i[ show edit update destroy users add_user]
+  before_action :set_tenant, only: [:show, :edit, :update, :destroy, :new, :create, :users, :add_user]
   before_action :verify_tenant
 
   # GET /projects or /projects.json
   def index
-    @projects = Project.all
+    @projects = Project.by_user_plan_and_tenant(params[:tenant_id], current_user)
   end
 
   # GET /projects/1 or /projects/1.json
@@ -21,10 +21,28 @@ class ProjectsController < ApplicationController
   def edit
   end
 
+  def users
+    @project_users = (@project.users + (User.where(tenant_id: @tenant.id, is_admin: true))) - [current_user]
+    @other_users = @tenant.users.where(is_admin: false) - (@project_users + [current_user])
+  end
+
+  def add_user 
+    @project_user = UserProject.new(user_id: params[:user_id], project_id: @project.id)
+    respond_to do |format|
+      if @project_user.save 
+        format.html {redirect_to users_tenant_project_path(@project.tenant_id,@project.id),
+                      notice: "User was susccessfully added to project"}
+      else
+        format.html {redirect_to users_tenant_project_path(@project.tenant_id,@project.id),
+                     error: "User was not added to project"}
+      end
+    end
+  end
+
   # POST /projects or /projects.json
   def create
     @project = Project.new(project_params)
-
+    @project.users << current_user
     respond_to do |format|
       if @project.save
         format.html { redirect_to root_path, notice: "Project was successfully created." }
@@ -55,24 +73,24 @@ class ProjectsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_project
-      @project = Project.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_project
+    @project = Project.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def project_params
-      params.require(:project).permit(:title, :details, :expected_completion_date, :tenant_id)
-    end
+  # Only allow a list of trusted parameters through.
+  def project_params
+    params.require(:project).permit(:title, :details, :expected_completion_date, :tenant_id)
+  end
 
-    def set_tenant
-      @tenant = Tenant.find(params[:tenant_id])
-    end
+  def set_tenant
+    @tenant = Tenant.find(params[:tenant_id])
+  end
 
-    def verify_tenant
-      unless params[:tenant_id] == Tenant.current_tenant.id.to_s
-        redirect_to :root, 
-                    flash: {error: "You are not authorized to access any organization other than your own"}
-      end
+  def verify_tenant
+    unless params[:tenant_id] == Tenant.current_tenant.id.to_s
+      redirect_to :root, 
+                  flash: {error: "You are not authorized to access any organization other than your own"}
     end
+  end
 end
